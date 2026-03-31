@@ -15,6 +15,9 @@ This project simulates a simplified version of systems like Redis, focusing on:
 
 It demonstrates core **distributed systems and backend engineering concepts** in a minimal and practical way.
 
+NOTE: This code only works in win system
+    For Linux and Mac => change the thread include files and thread usages.
+
 ---
 
 ## 🏗️ Architecture
