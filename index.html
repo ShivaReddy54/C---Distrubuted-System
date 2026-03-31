@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KV Store Dashboard</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #38bdf8;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+input {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: none;
+    width: 40%;
+}
+
+button {
+    padding: 10px 20px;
+    background: #38bdf8;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #0ea5e9;
+}
+
+#response {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.logs {
+    height: 200px;
+    overflow-y: auto;
+    background: black;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+.log-entry {
+    margin-bottom: 5px;
+}
+
+.success { color: #22c55e; }
+.error { color: #ef4444; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🚀 KV Store Dashboard</h1>
+
+    <div class="card">
+        <h3>SET Value</h3>
+        <input id="setKey" placeholder="Key">
+        <input id="setValue" placeholder="Value">
+        <button onclick="setValue()">SET</button>
+    </div>
+
+    <div class="card">
+        <h3>GET Value</h3>
+        <input id="getKey" placeholder="Key">
+        <button onclick="getValue()">GET</button>
+        <div id="response"></div>
+    </div>
+
+    <div class="card">
+        <h3>📊 Stats</h3>
+        <p>Total Requests: <span id="total">0</span></p>
+        <p>Success: <span id="success">0</span></p>
+        <p>Failed: <span id="failed">0</span></p>
+    </div>
+
+    <div class="card">
+        <h3>📜 Logs</h3>
+        <div class="logs" id="logs"></div>
+    </div>
+</div>
+
+<script>
+
+const API = "http://localhost:5000";
+
+let total = 0;
+let success = 0;
+let failed = 0;
+
+// ================= LOG =================
+function addLog(message, type="success") {
+    const log = document.createElement("div");
+    log.className = "log-entry " + type;
+    log.innerText = `[${new Date().toLocaleTimeString()}] ${message}`;
+    
+    const logs = document.getElementById("logs");
+    logs.appendChild(log);
+    logs.scrollTop = logs.scrollHeight;
+}
+
+// ================= UPDATE STATS =================
+function updateStats() {
+    document.getElementById("total").innerText = total;
+    document.getElementById("success").innerText = success;
+    document.getElementById("failed").innerText = failed;
+}
+
+// ================= SET =================
+async function setValue() {
+    const key = document.getElementById("setKey").value;
+    const value = document.getElementById("setValue").value;
+
+    total++;
+
+    try {
+        const res = await fetch(`${API}/set`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key, value })
+        });
+
+        const data = await res.text();
+
+        success++;
+        addLog(`SET ${key} = ${value} → ${data}`, "success");
+
+    } catch (err) {
+        failed++;
+        addLog(`SET FAILED: ${key}`, "error");
+    }
+
+    updateStats();
+}
+
+// ================= GET =================
+async function getValue() {
+    const key = document.getElementById("getKey").value;
+
+    total++;
+
+    try {
+        const res = await fetch(`${API}/get?key=${key}`);
+        const data = await res.text();
+
+        document.getElementById("response").innerText = data;
+
+        success++;
+        addLog(`GET ${key} → ${data}`, "success");
+
+    } catch (err) {
+        failed++;
+        addLog(`GET FAILED: ${key}`, "error");
+    }
+
+    updateStats();
+}
+
+</script>
+
+</body>
+</html>
