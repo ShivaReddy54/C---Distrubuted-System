@@ -18,15 +18,17 @@ It demonstrates core **distributed systems and backend engineering concepts** in
 ---
 
 ## 🏗️ Architecture
+
 Client
-↓
-[ Router (Load Balancer + Rate Limiter) ]
-↓
-[ Queue (Thread-safe) ]
-↓
-[ Thread Pool (Workers) ]
-↓
-[ KV Servers (Multiple Instances) ]
+    ↓    
+Router (Load Balancer + Rate Limiter)
+    ↓   
+Queue
+    ↓   
+Thread pool (workers)
+    ↓   
+Kv servers
+
 
 
 ---
